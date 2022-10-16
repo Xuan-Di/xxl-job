@@ -1,0 +1,22 @@
+初始化线程
+
+
+1、JobTriggerPoolHelper ： 触发任务线程池
+                  功能描述：包含两个线程池，快速触发任务线程池和慢触发任务线程池。会根据每分钟执行的次数决定任务投递到快速触发任务线程池还是慢触发任务线程池中 。
+
+            2、JobRegistryHelper： 执行器注册
+                  功能描述：此类包含一个线程池registryOrRemoveThreadPool和一个registryMonitorThread线程每隔30秒进行一次执行器地址确认（删除无效的地址，更新最新的地址）确保任务执行能够调度有效的client地址触发任务。
+
+           3、JobFailMonitorHelper：失败监控线程
+               功能描述： 主要是一个monitorThread线程，每隔10秒查询一次执行日志获取1000执行失败的日志，进行打标（告警标识和重试标识），从而触发告警逻辑和任务重试逻辑。
+
+          4、JobCompleteHelper：任务回调和任务丢失标记
+                功能描述： 主要有一个线程池callbackThreadPool主要处理client任务执行结果和日志输出等回调动作和一个任务丢失标记线程（每10分钟执行一次），任务结果丢失处理：调度记录停留在 "运行中" 状态超过10min，且对应执行器心跳注册失败不在线，则将本地调度主动标记失败；
+
+           5、JobLogReportHelper： 任务执行报表
+               功能描述：主要是一个logrThread日志报表线程，每分钟刷新一次任务执行报表数据
+
+           6、JobScheduleHelper：任务管理
+               功能描述：主要有两个线程和一个map，scheduleThread工作计划线程查询未来5秒内要执行的数据，同时更新下次执行时间，同时将要执行任务ID和几秒后执行存入map中。ringThread环线程，每次整秒校验一次map中是否有要触发的任务，如果有则投递到JobTriggerPoolHelper的线程池中
+
+     注：TimeUnit.MILLISECONDS.sleep(1000 - System.currentTimeMillis()%1000 ); 确保整点（秒）触发，System.currentTimeMillis()%1000 通过取余的方式获取当前毫秒精度，1000 - System.currentTimeMillis()%1000 差多少毫秒到下一秒，如果集群服务器（xxl-job admin server）上的时间不统一就可能导致多次触发的问题，就需要调整时间精度

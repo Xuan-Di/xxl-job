@@ -1,0 +1,8 @@
+这个类  在项目一启动的时候，就执行afterSingletonsInstantiated（）
+
+1  首先 根据上下文获取所有的bean对象，之后根据xxljob注解的名称为key,方法具体
+   信息为value保存到map里面；
+
+
+
+

@@ -1,0 +1,12 @@
+  处理器，执行方法，就是一个实体类
+
+
+
+  这个里面  就是保存  方法类
+  就是扫描到xxljob 注解的方法，把这个方法的信息，方法之前的方法，之后的方
+  法，就放到这个里面， 并且提供执行方法的代码
+
+  因为提供了  方法对象，bean对象，使用反射直接执行方法
+
+  实例化一个MethodJobHandler，然后根据XxlJob注解里的定义的init、
+  destory和value值找到对应的method对象，封装到MethodJobHandler里。
